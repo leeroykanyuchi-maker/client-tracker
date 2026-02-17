@@ -1,1 +1,55 @@
-<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>Client Pipeline Tracker</title>\n    <style>\n        body {\n            font-family: Arial, sans-serif;\n            background-color: #121212;\n            color: #FFFFFF;\n            margin: 0;\n            padding: 0;\n        }\n        header {\n            background-color: #00ff88;\n            padding: 20px;\n            text-align: center;\n        }\n        table {\n            width: 100%;\n            border-collapse: collapse;\n            margin: 20px 0;\n        }\n        table, th, td {\n            border: 1px solid #00ff88;\n        }\n        th, td {\n            padding: 10px;\n            text-align: left;\n        }\n        th {\n            background-color: #1d1d1d;\n        }\n        button {\n            background-color: #00ff88;\n            border: none;\n            color: white;\n            padding: 10px 20px;\n            cursor: pointer;\n        }\n        .modal {\n            display: none;\n            position: fixed;\n            z-index: 1;\n            left: 0;\n            top: 0;\n            width: 100%;\n            height: 100%;\n            overflow: auto;\n            background-color: rgb(0,0,0);\n            background-color: rgba(0,0,0,0.4);\n            padding-top: 60px;\n        }\n        .modal-content {\n            background-color: #fefefe;\n            margin: 5% auto;\n            padding: 20px;\n            border: 1px solid #888;\n            width: 80%;\n        }\n        .filter{\n            margin: 20px;\n        }\n    </style>\n</head>\n<body>\n    <header>\n        <h1>Client Pipeline Tracker</h1>\n    </header>\n    <div class="filter">\n        <label for="statusFilter">Filter by Status:</label>\n        <select id="statusFilter">\n            <option value="all">All</option>\n            <option value="lead">Lead</option>\n            <option value="contacted">Contacted</option>\n            <option value="negotiation">Negotiation</option>\n            <option value="won">Won</option>\n            <option value="lost">Lost</option>\n        </select>\n        <button onclick="filterByStatus()">Filter</button>\n    </div>\n    <table id="clientTable">\n        <thead>\n            <tr>\n                <th>Name</th>\n                <th>Status</th>\n                <th>Actions</th>\n            </tr>\n        </thead>\n        <tbody id="clientTbody">\n            <!-- Client rows will be injected here -->\n        </tbody>\n    </table>\n    <button onclick="openModal()">Add Client</button>\n    <div class="modal" id="clientModal">\n        <div class="modal-content">\n            <span onclick="closeModal()" style="float:right;cursor:pointer;">&times;</span>\n            <h2>Add Client</h2>\n            <label for="clientName">Name:</label>\n            <input type="text" id="clientName">\n            <label for="clientStatus">Status:</label>\n            <select id="clientStatus">\n                <option value="lead">Lead</option>\n                <option value="contacted">Contacted</option>\n                <option value="negotiation">Negotiation</option>\n                <option value="won">Won</option>\n                <option value="lost">Lost</option>\n            </select>\n            <button onclick="addClient()">Add</button>\n        </div>\n    </div>\n    <script>\n        let clients = JSON.parse(localStorage.getItem('clients')) || [];\n        const clientTbody = document.getElementById('clientTbody');\n        const statusFilter = document.getElementById('statusFilter');\n        function renderClients(filteredClients) {\n            clientTbody.innerHTML = '';\n            filteredClients.forEach((client, index) => {\n                const row = document.createElement('tr');\n                row.innerHTML = `<td>${client.name}</td><td>${client.status}</td><td><button onclick="deleteClient(${index})">Delete</button></td>`;\n                clientTbody.appendChild(row);\n            });\n        }\n        function filterByStatus() {\n            const status = statusFilter.value;\n            const filteredClients = status === 'all' ? clients : clients.filter(client => client.status === status);\n            renderClients(filteredClients);\n        }\n        function addClient() {\n            const name = document.getElementById('clientName').value;\n            const status = document.getElementById('clientStatus').value;\n            clients.push({name, status});\n            localStorage.setItem('clients', JSON.stringify(clients));\n            renderClients(clients);\n            closeModal();\n        }\n        function deleteClient(index) {\n            clients.splice(index, 1);\n            localStorage.setItem('clients', JSON.stringify(clients));\n            renderClients(clients);\n        }\n        function openModal() {\n            document.getElementById('clientModal').style.display = 'block';\n        }\n        function closeModal() {\n            document.getElementById('clientModal').style.display = 'none';\n        }\n        renderClients(clients);\n    </script>\n</body>\n</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Pipeline Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Client Pipeline Tracker</h1>
+            <nav>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Add Lead</a></li>
+                    <li><a href="#">Dashboard</a></li>
+                </ul>
+            </nav>
+        </header>
+        <main>
+            <section id="add-edit-lead">
+                <h2>Add/Edit Leads</h2>
+                <form id="lead-form">
+                    <input type="text" id="lead-name" placeholder="Enter lead name" required />
+                    <input type="number" id="deal-value" placeholder="Deal Value" required />
+                    <button type="submit">Save Lead</button>
+                </form>
+            </section>
+            <section id="leads-dashboard">
+                <h2>Leads Dashboard</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Value</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leads-table">
+                        <!-- Leads Data Will Be Injected Here -->
+                    </tbody>
+                </table>
+                <button id="export-csv">Export to CSV</button>
+            </section>
+            <section id="notes">
+                <h2>Notes</h2>
+                <textarea id="notes-area" placeholder="Add your notes here..."></textarea>
+            </section>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
